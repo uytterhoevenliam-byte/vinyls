@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="nl">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover" />
+    <title>Vinyl Collectie</title>
+    <link rel="icon" type="image/jpeg" href="favicon.jpeg" />
+
+    <style>
+        :root {
+            --bg: #0b0f14;
+            --card: #111826;
+            --text: #e5e7eb;
+            --muted: #9ca3af;
+            --line: rgba(255, 255, 255, .08);
+            --ok: #10b981;
+            --bad: #ef4444;
+            --warn: #f59e0b;
+            --btn: #1f2937;
+            --btn2: #2563eb;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(1200px 800px at 50% -200px, #1b2a4a 0%, var(--bg) 55%);
+            color: var(--text);
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            padding: 18px 14px calc(18px + env(safe-area-inset-bottom));
+        }
+
+        .wrap {
+            max-width: 920px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin: 0 0 20px;
+            font-size: 32px;
+            letter-spacing: .3px;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .015));
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 16px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .card h3 {
+            margin: 0 0 12px;
+            font-size: 18px;
+            color: #dbeafe;
+            letter-spacing: .2px;
+        }
+
+        input,
+        button {
+            font-size: 16px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, .03);
+            color: var(--text);
+            outline: none;
+        }
+
+        input::placeholder {
+            color: rgba(229, 231, 235, .55);
+        }
+
+        input {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        button {
+            background: var(--btn);
+            border-color: rgba(255, 255, 255, .10);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button.primary {
+            background: var(--btn2);
+            border-color: rgba(255, 255, 255, .15);
+        }
+
+        button.ghost {
+            background: rgba(255, 255, 255, .03);
+        }
+
+        button.danger {
+            background: var(--bad);
+            border-color: rgba(255, 255, 255, .15);
+        }
+
+        button:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .ok {
+            color: var(--ok);
+            font-weight: 700;
+        }
+
+        .bad {
+            color: var(--bad);
+            font-weight: 700;
+        }
+
+        .warn {
+            color: var(--warn);
+            font-weight: 700;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width: 680px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .sep {
+            height: 1px;
+            background: var(--line);
+            margin: 14px 0;
+        }
+
+        #reader {
+            width: 100%;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            background: rgba(0, 0, 0, .35);
+        }
+
+        .listItem {
+            display: grid;
+            grid-template-columns: 84px 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, .02);
+            margin-top: 10px;
+            transition: background .2s;
+        }
+
+        .listItem:hover {
+            background: rgba(255, 255, 255, .04);
+        }
+
+        .listItem-info {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .listItem-actions {
+            display: flex;
+            gap: 8px;
+            flex-direction: column;
+        }
+
+        .listItem-actions button {
+            padding: 8px 12px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .cover {
+            width: 84px;
+            height: 84px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, .03);
+        }
+
+        .small {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* Overlay styles */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+            backdrop-filter: blur(4px);
+        }
+
+        .overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .overlay-content {
+            background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+            position: relative;
+        }
+
+        .overlay-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .overlay-header h2 {
+            margin: 0;
+            font-size: 24px;
+            color: #dbeafe;
+        }
+
+        .overlay-close {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--muted);
+            padding: 0;
+        }
+
+        .overlay-close:hover {
+            background: rgba(255, 255, 255, .08);
+            color: var(--text);
+        }
+
+        .overlay-cover {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 12px;
+            margin: 0 auto 20px;
+            display: block;
+            border: 1px solid var(--line);
+        }
+
+        .detail-row {
+            margin: 12px 0;
+        }
+
+        .detail-label {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            color: var(--text);
+        }
+
+        .search-results-grid {
+            display: grid;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .search-result-item {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 14px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .02);
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .search-result-item:hover {
+            background: rgba(255, 255, 255, .05);
+            border-color: rgba(255, 255, 255, .15);
+        }
+
+        .search-result-cover {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, .03);
+        }
+
+        @media (max-width: 680px) {
+            .listItem {
+                grid-template-columns: 84px 1fr;
+            }
+
+            .listItem-actions {
+                grid-column: 2;
+                flex-direction: row;
+                margin-top: 8px;
+            }
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <h1>🎵 Vinyl Collectie</h1>
+
+        <div class="card">
+            <h3>Scan Barcode</h3>
+            <div class="row">
+                <button id="btnScanStart" class="primary">📷 Start Camera</button>
+                <button id="btnScanStop" disabled>Stop</button>
+            </div>
+
+            <div style="margin-top:10px;">
+                <div id="reader"></div>
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="row">
+                <input id="barcode" placeholder="Of typ barcode handmatig (optioneel)" inputmode="numeric" />
+                <button id="btnCheck" class="primary">Zoek</button>
+            </div>
+
+            <div id="statusOut" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="card">
+            <h3>Zoek op Naam</h3>
+            <div class="row">
+                <input id="nameSearch" placeholder="Artist of album titel..." />
+                <button id="btnNameSearch" class="primary">Zoek</button>
+            </div>
+
+            <div id="nameSearchStatus"></div>
+        </div>
+
+        <div class="card" id="confirmCard" style="display:none;">
+            <h3>Toevoegen aan Collectie</h3>
+
+            <div class="sep"></div>
+
+            <div class="row" style="align-items:flex-start;">
+                <img id="cover" class="cover" alt="cover" style="display:none;" />
+                <div style="flex:1;">
+                    <div id="discogsMeta" class="small"></div>
+                </div>
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="grid">
+                <div>
+                    <div class="small">Artist</div>
+                    <input id="artist" placeholder="Artist" />
+                </div>
+                <div>
+                    <div class="small">Titel</div>
+                    <input id="title" placeholder="Titel" />
+                </div>
+                <div>
+                    <div class="small">Jaar</div>
+                    <input id="year" placeholder="Jaar" inputmode="numeric" />
+                </div>
+                <div>
+                    <div class="small">Label</div>
+                    <input id="label" placeholder="Label" />
+                </div>
+                <div>
+                    <div class="small">Formaat</div>
+                    <input id="formats" placeholder="bijv. Vinyl, LP" />
+                </div>
+                <div>
+                    <div class="small">Barcode (optioneel)</div>
+                    <input id="barcodeConfirm" placeholder="Barcode" inputmode="numeric" />
+                </div>
+                <div style="display:none;">
+                    <input id="releaseId" />
+                </div>
+            </div>
+
+            <div class="row" style="margin-top:14px;">
+                <button id="btnAdd" class="primary">✓ Toevoegen</button>
+                <button id="btnCancel" class="ghost">Annuleer</button>
+                <span id="addOut" class="small"></span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Mijn Collectie</h3>
+            <div class="row">
+                <input id="searchText" placeholder="Zoek in collectie..." />
+                <button id="btnSearchDb" class="primary">Zoek</button>
+            </div>
+
+            <div id="dbOut" style="margin-top:10px;"></div>
+        </div>
+
+    </div>
+
+    <!-- Search Results Overlay -->
+    <div id="searchOverlay" class="overlay">
+        <div class="overlay-content">
+            <div class="overlay-header">
+                <h2>Selecteer Plaat</h2>
+                <button class="overlay-close" onclick="closeSearchOverlay()">×</button>
+            </div>
+            <div id="searchOverlayContent"></div>
+        </div>
+    </div>
+
+    <!-- Inspect Overlay -->
+    <div id="inspectOverlay" class="overlay">
+        <div class="overlay-content">
+            <div class="overlay-header">
+                <h2>Details</h2>
+                <button class="overlay-close" onclick="closeInspectOverlay()">×</button>
+            </div>
+            <div id="inspectOverlayContent"></div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Overlay -->
+    <div id="deleteOverlay" class="overlay">
+        <div class="overlay-content" style="max-width: 400px;">
+            <div class="overlay-header">
+                <h2>Verwijderen?</h2>
+                <button class="overlay-close" onclick="closeDeleteOverlay()">×</button>
+            </div>
+            <div id="deleteOverlayContent"></div>
+            <div class="row" style="margin-top:20px; justify-content: flex-end;">
+                <button onclick="closeDeleteOverlay()" class="ghost">Annuleer</button>
+                <button id="confirmDeleteBtn" class="danger">Verwijder</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://zdqmbktlincgutbitlur.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkcW1ia3RsaW5jZ3V0Yml0bHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NTgyNzIsImV4cCI6MjA4NTUzNDI3Mn0.fO40u52GuQvNnsORfUGC0Ure5xhWmpIjiAVu4_1-v9o";
+        const DISCOGS_TOKEN = "HEhbcQjNmXeiTjcMrWRrpfAzIRMFcwQpPUknrjbV";
+
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const statusOut = document.getElementById('statusOut');
+        const btnScanStart = document.getElementById('btnScanStart');
+        const btnScanStop = document.getElementById('btnScanStop');
+        const btnCheck = document.getElementById('btnCheck');
+        const barcodeEl = document.getElementById('barcode');
+        const barcodeConfirmEl = document.getElementById('barcodeConfirm');
+        const nameSearchEl = document.getElementById('nameSearch');
+        const btnNameSearch = document.getElementById('btnNameSearch');
+        const nameSearchStatus = document.getElementById('nameSearchStatus');
+        const confirmCard = document.getElementById('confirmCard');
+        const coverImg = document.getElementById('cover');
+        const discogsMeta = document.getElementById('discogsMeta');
+        const artistEl = document.getElementById('artist');
+        const titleEl = document.getElementById('title');
+        const yearEl = document.getElementById('year');
+        const labelEl = document.getElementById('label');
+        const formatsEl = document.getElementById('formats');
+        const releaseIdEl = document.getElementById('releaseId');
+        const btnAdd = document.getElementById('btnAdd');
+        const btnCancel = document.getElementById('btnCancel');
+        const addOut = document.getElementById('addOut');
+        const searchTextEl = document.getElementById('searchText');
+        const btnSearchDb = document.getElementById('btnSearchDb');
+        const dbOut = document.getElementById('dbOut');
+
+        const searchOverlay = document.getElementById('searchOverlay');
+        const searchOverlayContent = document.getElementById('searchOverlayContent');
+        const inspectOverlay = document.getElementById('inspectOverlay');
+        const inspectOverlayContent = document.getElementById('inspectOverlayContent');
+        const deleteOverlay = document.getElementById('deleteOverlay');
+        const deleteOverlayContent = document.getElementById('deleteOverlayContent');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+        let recordToDelete = null;
+
+        function esc(s) {
+            return String(s ?? "").replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c]));
+        }
+        function setStatus(html) { statusOut.innerHTML = html; }
+        function setDb(html) { dbOut.innerHTML = html; }
+        function setAdd(html) { addOut.innerHTML = html; }
+        function setNameSearchStatus(html) { nameSearchStatus.innerHTML = html; }
+
+        function openSearchOverlay() {
+            searchOverlay.classList.add('active');
+        }
+
+        function closeSearchOverlay() {
+            searchOverlay.classList.remove('active');
+        }
+
+        function openInspectOverlay() {
+            inspectOverlay.classList.add('active');
+        }
+
+        function closeInspectOverlay() {
+            inspectOverlay.classList.remove('active');
+        }
+
+        function openDeleteOverlay() {
+            deleteOverlay.classList.add('active');
+        }
+
+        function closeDeleteOverlay() {
+            deleteOverlay.classList.remove('active');
+            recordToDelete = null;
+        }
+
+        function showSearchResults(results) {
+            if (!results.length) {
+                searchOverlayContent.innerHTML = `<div class="warn">Geen resultaten gevonden</div>`;
+                return;
+            }
+
+            searchOverlayContent.innerHTML = `
+                <div class="search-results-grid">
+                    ${results.map((r, i) => `
+                        <div class="search-result-item" data-result-index="${i}">
+                            ${r.cover_image ?
+                    `<img class="search-result-cover" src="${esc(r.cover_image)}" alt="cover" />` :
+                    `<div class="search-result-cover"></div>`
+                }
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 6px;">${esc(r.title || "")}</div>
+                                <div class="small">
+                                    ${r.year ? esc(r.year) : ""}
+                                    ${r.label?.[0] ? " • " + esc(r.label[0]) : ""}
+                                    ${r.format?.length ? " • " + esc(r.format.join(", ")) : ""}
+                                </div>
+                            </div>
+                        </div>
+                    `).join("")}
+                </div>
+            `;
+        }
+
+        function showInspectDetails(record) {
+            inspectOverlayContent.innerHTML = `
+                ${record.cover_image ? `<img class="overlay-cover" src="${esc(record.cover_image)}" alt="cover" />` : ""}
+                
+                <div class="detail-row">
+                    <div class="detail-label">Artist</div>
+                    <div class="detail-value">${esc(record.artist || "-")}</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Titel</div>
+                    <div class="detail-value">${esc(record.title || "-")}</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Jaar</div>
+                    <div class="detail-value">${record.year ? esc(record.year) : "-"}</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Label</div>
+                    <div class="detail-value">${esc(record.label || "-")}</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Formaat</div>
+                    <div class="detail-value">${esc(record.formats || "-")}</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Barcode</div>
+                    <div class="detail-value">${esc(record.barcode || "-")}</div>
+                </div>
+
+                ${record.discogs_release_id ? `
+                    <div class="detail-row">
+                        <div class="detail-label">Discogs Release ID</div>
+                        <div class="detail-value">${esc(record.discogs_release_id)}</div>
+                    </div>
+                ` : ""}
+
+                <div class="detail-row">
+                    <div class="detail-label">Toegevoegd op</div>
+                    <div class="detail-value">${new Date(record.created_at).toLocaleDateString('nl-NL')}</div>
+                </div>
+            `;
+        }
+
+        function showDeleteConfirmation(record) {
+            recordToDelete = record;
+            deleteOverlayContent.innerHTML = `
+                <p style="margin: 16px 0; line-height: 1.6;">
+                    Weet je zeker dat je deze plaat wilt verwijderen uit je collectie?
+                </p>
+                <div style="background: rgba(255, 255, 255, .03); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-top: 16px;">
+                    <div style="font-weight: 600;">${esc(record.artist || "")} — ${esc(record.title || "")}</div>
+                    <div class="small" style="margin-top: 6px;">
+                        ${record.year ? esc(record.year) : ""}
+                        ${record.label ? " • " + esc(record.label) : ""}
+                    </div>
+                </div>
+            `;
+            openDeleteOverlay();
+        }
+
+        async function deleteRecord() {
+            if (!recordToDelete) return;
+
+            try {
+                // Use id if available, otherwise fall back to composite key
+                let query = sb.from('records').delete();
+
+                if (recordToDelete.id) {
+                    query = query.eq('id', recordToDelete.id);
+                } else {
+                    // Fallback to composite key if id is not available
+                    query = query
+                        .eq('artist', recordToDelete.artist)
+                        .eq('title', recordToDelete.title)
+                        .eq('created_at', recordToDelete.created_at);
+                }
+
+                const { error } = await query;
+
+                if (error) throw new Error(error.message);
+
+                closeDeleteOverlay();
+                await loadCollection();
+                setStatus(`<div class="ok">✓ Plaat verwijderd uit collectie</div>`);
+            } catch (e) {
+                alert(`Fout bij verwijderen: ${e.message}`);
+                console.error('Delete error:', e);
+            }
+        }
+
+        confirmDeleteBtn.addEventListener('click', deleteRecord);
+
+        let html5QrCode = null;
+        let scanning = false;
+
+        async function startScan() {
+            clearConfirm();
+            setStatus("");
+
+            if (!window.Html5Qrcode) {
+                setStatus(`<div class="bad">Camera niet beschikbaar. Gebruik handmatige invoer.</div>`);
+                return;
+            }
+
+            try {
+                if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+
+                const cameras = await Html5Qrcode.getCameras();
+                if (!cameras || cameras.length === 0) {
+                    setStatus(`<div class="bad">Geen camera gevonden.</div>`);
+                    return;
+                }
+
+                const back = cameras.find(c => /back|rear|environment/i.test(c.label));
+                const camId = (back ? back.id : cameras[cameras.length - 1].id);
+
+                scanning = true;
+                btnScanStart.disabled = true;
+                btnScanStop.disabled = false;
+
+                await html5QrCode.start(
+                    { deviceId: { exact: camId } },
+                    { fps: 12, qrbox: { width: 260, height: 170 }, aspectRatio: 1.777 },
+                    (decodedText) => {
+                        barcodeEl.value = decodedText.trim();
+                        setStatus(`<div class="ok">✓ Barcode gescand</div>`);
+                        stopScan();
+                        onCheck();
+                    },
+                    () => { }
+                );
+
+            } catch (e) {
+                setStatus(`<div class="bad">Camera error. Gebruik handmatige invoer.</div>`);
+                btnScanStart.disabled = false;
+                btnScanStop.disabled = true;
+                scanning = false;
+            }
+        }
+
+        async function stopScan() {
+            try {
+                if (html5QrCode && scanning) {
+                    await html5QrCode.stop();
+                    await html5QrCode.clear();
+                }
+            } catch { }
+            scanning = false;
+            btnScanStart.disabled = false;
+            btnScanStop.disabled = true;
+        }
+
+        async function checkBarcodeInDB(barcode) {
+            if (!barcode) return null;
+            const { data, error } = await sb
+                .from('records')
+                .select('*')
+                .eq('barcode', barcode)
+                .maybeSingle();
+            if (error) throw new Error(error.message);
+            return data;
+        }
+
+        async function insertRecord(payload) {
+            const { error } = await sb.from('records').insert(payload);
+            if (error) throw new Error(error.message);
+        }
+
+        async function discogsSearch(params) {
+            const base = new URL("https://api.discogs.com/database/search");
+            if (params.barcode) base.searchParams.set("barcode", params.barcode);
+            if (params.q) base.searchParams.set("q", params.q);
+            base.searchParams.set("type", "release");
+            base.searchParams.set("token", DISCOGS_TOKEN);
+
+            const res = await fetch(base.toString());
+            if (!res.ok) {
+                const txt = await res.text().catch(() => "");
+                throw new Error(`Discogs error (${res.status}): ${txt}`);
+            }
+            const json = await res.json();
+            return json.results || [];
+        }
+
+        function parseDiscogsTitle(t) {
+            const parts = (t || "").split(" - ");
+            if (parts.length >= 2) return { artist: parts[0].trim(), title: parts.slice(1).join(" - ").trim() };
+            return { artist: "", title: t || "" };
+        }
+
+        function openConfirmFromDiscogs(r) {
+            confirmCard.style.display = "block";
+            setAdd("");
+
+            const parsed = parseDiscogsTitle(r.title);
+            artistEl.value = parsed.artist || "";
+            titleEl.value = parsed.title || "";
+            yearEl.value = r.year || "";
+            labelEl.value = (r.label && r.label[0]) ? r.label[0] : "";
+            formatsEl.value = (r.format && r.format.length) ? r.format.join(", ") : "";
+            releaseIdEl.value = r.id ? String(r.id) : "";
+            barcodeConfirmEl.value = barcodeEl.value.trim();
+
+            if (r.cover_image) {
+                coverImg.src = r.cover_image;
+                coverImg.style.display = "block";
+            } else {
+                coverImg.style.display = "none";
+            }
+
+            discogsMeta.innerHTML = `<div>${esc(r.title || "")}${r.year ? " (" + esc(r.year) + ")" : ""}</div>`;
+            window.__discogsSelected = r;
+
+            closeSearchOverlay();
+        }
+
+        function openConfirmManual() {
+            confirmCard.style.display = "block";
+            setAdd("");
+            discogsMeta.innerHTML = `<div class="muted">Niet gevonden. Vul handmatig in.</div>`;
+            coverImg.style.display = "none";
+            barcodeConfirmEl.value = barcodeEl.value.trim();
+            window.__discogsSelected = null;
+            closeSearchOverlay();
+        }
+
+        function clearConfirm() {
+            confirmCard.style.display = "none";
+            coverImg.src = "";
+            coverImg.style.display = "none";
+            discogsMeta.innerHTML = "";
+            artistEl.value = "";
+            titleEl.value = "";
+            yearEl.value = "";
+            labelEl.value = "";
+            formatsEl.value = "";
+            releaseIdEl.value = "";
+            barcodeConfirmEl.value = "";
+            setAdd("");
+            window.__discogsSelected = null;
+        }
+
+        async function onCheck() {
+            clearConfirm();
+            setStatus("");
+            setAdd("");
+
+            const barcode = barcodeEl.value.trim();
+
+            if (barcode) {
+                setStatus(`<div class="muted">Zoeken...</div>`);
+
+                try {
+                    const existing = await checkBarcodeInDB(barcode);
+                    if (existing) {
+                        setStatus(`<div class="ok">✓ Al in collectie</div>
+                            <div class="small">${esc(existing.artist || "")} — ${esc(existing.title || "")}</div>`);
+                        return;
+                    }
+
+                    const results = await discogsSearch({ barcode });
+
+                    if (!results.length) {
+                        setStatus(`<div class="warn">Niet gevonden op Discogs</div>`);
+                        openConfirmManual();
+                        return;
+                    }
+
+                    window.__discogsResults = results.slice(0, 8);
+                    showSearchResults(window.__discogsResults);
+                    openSearchOverlay();
+                    setStatus(`<div class="ok">✓ ${results.length} resultaten gevonden</div>`);
+
+                } catch (e) {
+                    setStatus(`<div class="bad">Fout: ${esc(e.message || e)}</div>`);
+                }
+            } else {
+                setStatus(`<div class="muted">Vul gegevens handmatig in</div>`);
+                openConfirmManual();
+            }
+        }
+
+        let debounce = null;
+
+        async function runNameSearch() {
+            const q = nameSearchEl.value.trim();
+            if (q.length < 3) {
+                setNameSearchStatus(`<div class="muted" style="margin-top:10px;">Typ minstens 3 tekens</div>`);
+                return;
+            }
+
+            barcodeEl.value = "";
+
+            setNameSearchStatus(`<div class="muted" style="margin-top:10px;">Zoeken...</div>`);
+            try {
+                const results = await discogsSearch({ q });
+                const top = results.slice(0, 8);
+                window.__nameResults = top;
+
+                if (!top.length) {
+                    setNameSearchStatus(`<div class="warn" style="margin-top:10px;">Geen resultaten</div>`);
+                    return;
+                }
+
+                showSearchResults(window.__nameResults);
+                openSearchOverlay();
+                setNameSearchStatus(`<div class="ok" style="margin-top:10px;">✓ ${top.length} resultaten gevonden</div>`);
+            } catch (e) {
+                setNameSearchStatus(`<div class="bad" style="margin-top:10px;">Fout: ${esc(e.message || e)}</div>`);
+            }
+        }
+
+        async function onAdd() {
+            const barcode = barcodeConfirmEl.value.trim() || null;
+            const artist = artistEl.value.trim();
+            const title = titleEl.value.trim();
+
+            if (!artist || !title) {
+                setAdd(`<span class="bad">Vul artist en titel in</span>`);
+                return;
+            }
+
+            const yearRaw = yearEl.value.trim();
+            const year = yearRaw ? parseInt(yearRaw, 10) : null;
+
+            const payload = {
+                barcode: barcode,
+                discogs_release_id: releaseIdEl.value.trim() ? parseInt(releaseIdEl.value.trim(), 10) : null,
+                artist,
+                title,
+                year: Number.isFinite(year) ? year : null,
+                label: labelEl.value.trim() || null,
+                formats: formatsEl.value.trim() || null,
+                cover_image: coverImg.style.display === "block" ? (coverImg.src || null) : null
+            };
+
+            setAdd(`<span class="muted">Toevoegen...</span>`);
+            try {
+                await insertRecord(payload);
+                setAdd(`<span class="ok">✓ Toegevoegd</span>`);
+                setStatus(`<div class="ok">✓ Toegevoegd aan collectie</div>`);
+
+                barcodeEl.value = "";
+                nameSearchEl.value = "";
+                setNameSearchStatus("");
+
+                clearConfirm();
+                await loadCollection();
+            } catch (e) {
+                setAdd(`<span class="bad">Fout: ${esc(e.message || e)}</span>`);
+            }
+        }
+
+        async function loadCollection() {
+            setDb(`<div class="muted">Laden...</div>`);
+            try {
+                const { data, error } = await sb
+                    .from('records')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+
+                if (error) throw new Error(error.message);
+
+                if (!data || !data.length) {
+                    setDb(`<div class="muted">Nog geen platen in collectie</div>`);
+                    return;
+                }
+
+                setDb(data.map(r => `
+                    <div class="listItem">
+                        ${r.cover_image ? `<img class="cover" src="${esc(r.cover_image)}" alt="cover" />` : `<div class="cover"></div>`}
+                        <div class="listItem-info" data-inspect='${JSON.stringify(r).replace(/'/g, "&apos;")}'>
+                            <div><b>${esc(r.artist || "")}</b> — ${esc(r.title || "")}</div>
+                            <div class="small">${r.year ? esc(r.year) : ""}${r.label ? " • " + esc(r.label) : ""}${r.barcode ? " • " + esc(r.barcode) : ""}</div>
+                        </div>
+                        <div class="listItem-actions">
+                            <button class="ghost" data-inspect='${JSON.stringify(r).replace(/'/g, "&apos;")}'>👁️ Bekijk</button>
+                            <button class="danger" data-delete='${JSON.stringify(r).replace(/'/g, "&apos;")}'>🗑️ Verwijder</button>
+                        </div>
+                    </div>
+                `).join(""));
+            } catch (e) {
+                setDb(`<div class="bad">Fout bij laden collectie</div>`);
+            }
+        }
+
+        async function searchDb() {
+            const q = searchTextEl.value.trim();
+            if (!q) { await loadCollection(); return; }
+
+            setDb(`<div class="muted">Zoeken...</div>`);
+            try {
+                const { data, error } = await sb
+                    .from('records')
+                    .select('*')
+                    .or(`barcode.ilike.%${q}%,artist.ilike.%${q}%,title.ilike.%${q}%`)
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+
+                if (error) throw new Error(error.message);
+
+                if (!data || !data.length) {
+                    setDb(`<div class="warn">Geen resultaten voor "${esc(q)}"</div>`);
+                    return;
+                }
+
+                setDb(data.map(r => `
+                    <div class="listItem">
+                        ${r.cover_image ? `<img class="cover" src="${esc(r.cover_image)}" alt="cover" />` : `<div class="cover"></div>`}
+                        <div class="listItem-info" data-inspect='${JSON.stringify(r).replace(/'/g, "&apos;")}'>
+                            <div><b>${esc(r.artist || "")}</b> — ${esc(r.title || "")}</div>
+                            <div class="small">${r.year ? esc(r.year) : ""}${r.label ? " • " + esc(r.label) : ""}${r.barcode ? " • " + esc(r.barcode) : ""}</div>
+                        </div>
+                        <div class="listItem-actions">
+                            <button class="ghost" data-inspect='${JSON.stringify(r).replace(/'/g, "&apos;")}'>👁️ Bekijk</button>
+                            <button class="danger" data-delete='${JSON.stringify(r).replace(/'/g, "&apos;")}'>🗑️ Verwijder</button>
+                        </div>
+                    </div>
+                `).join(""));
+            } catch (e) {
+                setDb(`<div class="bad">Zoekfout</div>`);
+            }
+        }
+
+        // Event listeners
+        btnScanStart.addEventListener('click', startScan);
+        btnScanStop.addEventListener('click', stopScan);
+        btnCheck.addEventListener('click', onCheck);
+
+        btnNameSearch.addEventListener('click', runNameSearch);
+        nameSearchEl.addEventListener('keydown', (e) => {
+            if (e.key === "Enter") runNameSearch();
+        });
+
+        searchOverlayContent.addEventListener('click', (e) => {
+            const item = e.target.closest('[data-result-index]');
+            if (item) {
+                const i = parseInt(item.dataset.resultIndex, 10);
+                const results = window.__discogsResults || window.__nameResults || [];
+                const r = results[i];
+                if (r) openConfirmFromDiscogs(r);
+            }
+        });
+
+        dbOut.addEventListener('click', (e) => {
+            const inspectBtn = e.target.closest('[data-inspect]');
+            if (inspectBtn) {
+                const record = JSON.parse(inspectBtn.dataset.inspect);
+                showInspectDetails(record);
+                openInspectOverlay();
+                return;
+            }
+
+            const deleteBtn = e.target.closest('[data-delete]');
+            if (deleteBtn) {
+                const record = JSON.parse(deleteBtn.dataset.delete);
+                showDeleteConfirmation(record);
+            }
+        });
+
+        btnAdd.addEventListener('click', onAdd);
+        btnCancel.addEventListener('click', clearConfirm);
+
+        btnSearchDb.addEventListener('click', searchDb);
+        searchTextEl.addEventListener('keydown', (e) => { if (e.key === "Enter") searchDb(); });
+
+        // Close overlays on background click
+        [searchOverlay, inspectOverlay, deleteOverlay].forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+
+        // Load collection on start
+        loadCollection();
+    </script>
+</body>
+
+</html>
