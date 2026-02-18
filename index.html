@@ -765,8 +765,7 @@
         }
 
         async function discogsSearch(params) {
-            const base = new URL("https://api.discogs.com/database/search");
-            if (params.barcode) base.searchParams.set("barcode", params.barcode);
+            const base = new URL("https://curly-field-0074.uytterhoevenliam.workers.dev/database/search"); if (params.barcode) base.searchParams.set("barcode", params.barcode);
             if (params.q) base.searchParams.set("q", params.q);
             base.searchParams.set("type", "release");
             base.searchParams.set("token", DISCOGS_TOKEN);
